@@ -1,5 +1,7 @@
-import { expect } from 'chai';
-import { renderComponent } from 'helpers/TestHelper';
+// tslint:disable: no-unused-expression
+
+import { expect } from 'chai';
+import { renderComponent } from '../../helpers/TestHelper';
 import { Stars } from './index';
 
 /** Mock App. State */
@@ -11,7 +13,6 @@ const state: object = {
 };
 
 describe('<Counter />', () => {
-
   const component = renderComponent(Stars, state);
 
   it('Renders with correct style', () => {
@@ -22,5 +23,4 @@ describe('<Counter />', () => {
   it('Renders header', () => {
     expect(component.find('div').text()).to.eql('61');
   });
-
 });

@@ -1,10 +1,9 @@
 import { expect } from 'chai';
 import * as counter from './';
-import { ICounter, ICounterAction } from 'models/counter';
+import { ICounter, ICounterAction } from '../../../models/counter';
 
 /** Module */
 describe('Counter Module', () => {
-
   /** Actions */
   describe('Actions', () => {
     describe('Increment', () => {
@@ -24,7 +23,6 @@ describe('Counter Module', () => {
 
   /** Reducer */
   describe('Reducer', () => {
-
     const state: ICounter = { count: 10 };
 
     it('handles action of type INCREMENT', () => {
@@ -40,7 +38,5 @@ describe('Counter Module', () => {
     it('handles actions with unknown type', () => {
       expect(counter.counterReducer(state, { type: '' })).to.be.eql({ count: state.count });
     });
-
   });
-
 });

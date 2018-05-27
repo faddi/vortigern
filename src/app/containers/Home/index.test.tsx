@@ -1,9 +1,10 @@
-import { expect } from 'chai';
-import { renderComponent } from 'helpers/TestHelper';
-import { Home } from './index';
+// tslint:disable: no-unused-expression
+
+import { expect } from 'chai';
+import { renderComponent } from '../../helpers/TestHelper';
+import { Home } from './index';
 
 describe('<Home />', () => {
-
   const component = renderComponent(Home);
 
   it('Renders with correct style', () => {
@@ -18,5 +19,4 @@ describe('<Home />', () => {
   it('Has a p element that says Hello!', () => {
     expect(component.find('p').text()).eql('Hello!');
   });
-
 });

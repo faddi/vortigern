@@ -5,28 +5,30 @@ import 'isomorphic-fetch';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-const { Router, browserHistory } = require('react-router');
-import { syncHistoryWithStore } from 'react-router-redux';
-const { ReduxAsyncConnect } = require('redux-connect');
-import { configureStore } from './app/redux/store';
-import 'isomorphic-fetch';
-import routes from './app/routes';
+import { renderRoutes } from 'react-router-config';
+const { browserHistory } = require('react-router');
 
-const store = configureStore(
-  browserHistory,
-  window.__INITIAL_STATE__,
-);
-const history = syncHistoryWithStore(browserHistory, store);
-const connectedCmp = (props) => <ReduxAsyncConnect {...props} />;
+// import {} from 'react-router';
+
+// import { syncHistoryWithStore } from 'react-router-redux';
+
+import { ConnectedRouter } from 'react-router-redux';
+import { createBrowserHistory } from 'history';
+// import { ReduxAsyncConnect } from 'redux-connect';
+// import { BrowserRouter } from 'react-router-dom';
+import { routes } from './app/routes';
+
+// const { ReduxAsyncConnect } = require('redux-connect');
+import { configureStore } from './app/redux/store';
+
+const store = configureStore(browserHistory, window.__INITIAL_STATE__);
+const history = createBrowserHistory();
+// const history = syncHistoryWithStore(browserHistory, store);
+// const connectedCmp = props => <ReduxAsyncConnect {...props} />;
 
 ReactDOM.hydrate(
   <Provider store={store} key="provider">
-    <Router
-      history={history}
-      render={connectedCmp}
-    >
-      {routes}
-    </Router>
+    <ConnectedRouter history={history}>{renderRoutes(routes)}</ConnectedRouter>
   </Provider>,
-  document.getElementById('app'),
+  document.getElementById('app')
 );

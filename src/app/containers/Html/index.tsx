@@ -1,20 +1,25 @@
-import { IStore } from 'redux/IStore';
+import { IStore } from '../../redux/IStore';
 import * as React from 'react';
 import { Helmet } from 'react-helmet';
 import * as serialize from 'serialize-javascript';
+import { Store } from 'redux';
 
 interface IHtmlProps {
   manifest?: any;
   markup?: string;
-  store?: Redux.Store<IStore>;
+  store?: Store<IStore>;
 }
 
 class Html extends React.Component<IHtmlProps, {}> {
   private resolve(files) {
-    return files.map((src) => {
-      if (!this.props.manifest[src]) { return; }
-      return '/public/' + this.props.manifest[src];
-    }).filter((file) => file !== undefined);
+    return files
+      .map(src => {
+        if (!this.props.manifest[src]) {
+          return;
+        }
+        return this.props.manifest[src];
+      })
+      .filter(file => file !== undefined);
   }
 
   public render() {
@@ -22,20 +27,16 @@ class Html extends React.Component<IHtmlProps, {}> {
     const { markup, store } = this.props;
 
     const styles = this.resolve(['vendor.css', 'app.css']);
-    const renderStyles = styles.map((src, i) =>
-      <link key={i} rel="stylesheet" type="text/css" href={src} />,
-    );
+    const renderStyles = styles.map((src, i) => <link key={i} rel="stylesheet" type="text/css" href={src} />);
 
     const scripts = this.resolve(['vendor.js', 'app.js']);
-    const renderScripts = scripts.map((src, i) =>
-      <script src={src} key={i} />,
-    );
+    const renderScripts = scripts.map((src, i) => <script src={src} key={i} />);
 
-    // tslint:disable-next-line:max-line-length
-    const initialState = (
-      <script dangerouslySetInnerHTML={{ __html: `window.__INITIAL_STATE__=${serialize(store.getState(), { isJSON: true })};` }}
-              charSet="UTF-8" />
-    );
+    const state = {
+      __html: `window.__INITIAL_STATE__=${serialize(store.getState(), { isJSON: true })};`,
+    };
+
+    const initialState = <script dangerouslySetInnerHTML={state} charSet="UTF-8" />;
 
     return (
       <html>
@@ -59,4 +60,4 @@ class Html extends React.Component<IHtmlProps, {}> {
   }
 }
 
-export { Html }
+export { Html };

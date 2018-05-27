@@ -1,5 +1,7 @@
-import { expect } from 'chai';
-import { renderComponent } from 'helpers/TestHelper';
+// tslint:disable: no-unused-expression
+
+import { expect } from 'chai';
+import { renderComponent } from '../../helpers/TestHelper';
 import { Counter } from './index';
 
 /** Mock App. State */
@@ -8,7 +10,6 @@ const state: object = {
 };
 
 describe('<Counter />', () => {
-
   let component;
 
   beforeEach(() => {
@@ -43,5 +44,4 @@ describe('<Counter />', () => {
     component.find({ name: 'decBtn' }).simulate('click');
     expect(component.find('p').text()).to.eql('0');
   });
-
 });

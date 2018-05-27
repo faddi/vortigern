@@ -6,16 +6,18 @@ var postcssNext = require('postcss-cssnext');
 var stylelint = require('stylelint');
 
 var nodeModules = {};
-fs.readdirSync('node_modules')
-  .filter(function (x) {
+fs
+  .readdirSync('node_modules')
+  .filter(function(x) {
     return ['.bin'].indexOf(x) === -1;
   })
-  .forEach(function (mod) {
+  .forEach(function(mod) {
     nodeModules[mod] = 'commonjs ' + mod;
   });
 
 var config = {
   externals: nodeModules,
+  mode: 'development',
   target: 'node',
 
   resolve: {
@@ -29,59 +31,56 @@ var config = {
     path: path.resolve('./build/public'),
     filename: '../server.js',
     publicPath: '/public/',
-    libraryTarget: 'commonjs2'
+    libraryTarget: 'commonjs2',
   },
 
   module: {
-    loaders: [{
-        test: /\.(jpe?g|png|gif)$/i,
-        loader: 'url-loader?limit=1000&name=images/[hash].[ext]'
-      },
+    rules: [
       {
-        test: /\.json$/,
-        loader: 'json-loader'
+        test: /\.(jpe?g|png|gif)$/i,
+        loader: 'url-loader?limit=1000&name=images/[hash].[ext]',
       },
       {
         test: /\.jsx$/,
-        loader: 'babel-loader'
+        loader: 'babel-loader',
       },
       {
         test: /\.tsx?$/,
         loader: 'awesome-typescript-loader',
-        exclude: /node_modules/
+        exclude: /node_modules/,
       },
       {
         test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: "url-loader?limit=10000&mimetype=application/font-woff"
+        loader: 'url-loader?limit=10000&mimetype=application/font-woff',
       },
       {
         test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: "file-loader"
+        loader: 'file-loader',
       },
       {
         test: /\.css$/,
         loaders: [
           'isomorphic-style-loader',
-          'css-loader?modules&importLoaders=2&localIdentName=[local]___[hash:base64:5]'
-        ]
-      }
-    ]
+          'css-loader?modules&importLoaders=2&localIdentName=[local]___[hash:base64:5]',
+        ],
+      },
+    ],
   },
 
   plugins: [
-      new webpack.LoaderOptionsPlugin({
-        debug: false,
-        options: {
-          postcss: function () {
-            return [
-              postcssNext(),
-              postcssAssets({
-                relative: true
-              }),
-            ];
-          },
-        }
-      })
+    new webpack.LoaderOptionsPlugin({
+      debug: false,
+      options: {
+        postcss: function() {
+          return [
+            postcssNext(),
+            postcssAssets({
+              relative: true,
+            }),
+          ];
+        },
+      },
+    }),
   ],
 
   node: {
@@ -90,8 +89,8 @@ var config = {
     process: false,
     Buffer: false,
     __filename: false,
-    __dirname: false
-  }
+    __dirname: false,
+  },
 };
 
 const copySync = (src, dest, overwrite) => {
@@ -100,13 +99,13 @@ const copySync = (src, dest, overwrite) => {
   }
   const data = fs.readFileSync(src);
   fs.writeFileSync(dest, data);
-}
+};
 
 const createIfDoesntExist = dest => {
   if (!fs.existsSync(dest)) {
     fs.mkdirSync(dest);
   }
-}
+};
 
 createIfDoesntExist('./build');
 createIfDoesntExist('./build/public');

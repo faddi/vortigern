@@ -8,6 +8,9 @@
       true,
       "spaces"
     ],
+    "arrow-parens": false,
+    "trailing-comma": false,
+    "no-submodule-imports": false,
     "quotemark": [
       true,
       "single",

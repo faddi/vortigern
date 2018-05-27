@@ -5,14 +5,14 @@ import * as e6p from 'es6-promise';
 import 'isomorphic-fetch';
 
 import * as React from 'react';
-import * as ReactDOMServer from 'react-dom/server';
+import { renderToString } from 'react-dom/server';
 
 import { Provider } from 'react-redux';
-import { createMemoryHistory, match } from 'react-router';
-import { syncHistoryWithStore } from 'react-router-redux';
-const { ReduxAsyncConnect, loadOnServer } = require('redux-connect');
+import { StaticRouter } from 'react-router';
+import { matchRoutes, renderRoutes } from 'react-router-config';
 import { configureStore } from './app/redux/store';
-import routes from './app/routes';
+import { routes } from './app/routes';
+const { browserHistory } = require('react-router');
 
 import { Html } from './app/containers';
 const manifest = require('../build/manifest.json');
@@ -32,16 +32,18 @@ if (process.env.NODE_ENV !== 'production') {
   const webpackConfig = require('../config/webpack/dev');
   const webpackCompiler = webpack(webpackConfig);
 
-  app.use(require('webpack-dev-middleware')(webpackCompiler, {
-    publicPath: webpackConfig.output.publicPath,
-    stats: { colors: true },
-    noInfo: true,
-    hot: true,
-    inline: true,
-    lazy: false,
-    historyApiFallback: true,
-    quiet: true,
-  }));
+  app.use(
+    require('webpack-dev-middleware')(webpackCompiler, {
+      publicPath: webpackConfig.output.publicPath,
+      stats: { colors: true },
+      noInfo: true,
+      hot: true,
+      inline: true,
+      lazy: false,
+      historyApiFallback: true,
+      quiet: true,
+    })
+  );
 
   app.use(require('webpack-hot-middleware')(webpackCompiler));
 }
@@ -50,49 +52,75 @@ app.use(favicon(path.join(__dirname, 'public/favicon.ico')));
 
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
+/*
 app.get('*', (req, res) => {
   const location = req.url;
   const memoryHistory = createMemoryHistory(req.originalUrl);
   const store = configureStore(memoryHistory);
   const history = syncHistoryWithStore(memoryHistory, store);
 
-  match({ history, routes, location },
-    (error, redirectLocation, renderProps) => {
-      if (error) {
-        res.status(500).send(error.message);
-      } else if (redirectLocation) {
-        res.redirect(302, redirectLocation.pathname + redirectLocation.search);
-      } else if (renderProps) {
-        const asyncRenderData = Object.assign({}, renderProps, { store });
+  match({ history, routes, location }, (error, redirectLocation, renderProps) => {
+    if (error) {
+      res.status(500).send(error.message);
+    } else if (redirectLocation) {
+      res.redirect(302, redirectLocation.pathname + redirectLocation.search);
+    } else if (renderProps) {
+      const asyncRenderData = Object.assign({}, renderProps, { store });
 
-        loadOnServer(asyncRenderData).then(() => {
-          const markup = ReactDOMServer.renderToString(
-            <Provider store={store} key="provider">
-              <ReduxAsyncConnect {...renderProps} />
-            </Provider>,
-          );
-          res.status(200).send(renderHTML(markup, store));
-        });
-      } else {
-        res.status(404).send('Not Found?');
-      }
-    });
+      loadOnServer(asyncRenderData).then(() => {
+        const markup = ReactDOMServer.renderToString(
+          <Provider store={store} key="provider">
+            <ReduxAsyncConnect {...renderProps} />
+          </Provider>
+        );
+        res.status(200).send(renderHTML(markup, store));
+      });
+    } else {
+      res.status(404).send('Not Found?');
+    }
+  });
+});
+*/
+
+const store = configureStore(browserHistory);
+
+// https://crypt.codemancers.com/posts/2017-06-03-reactjs-server-side-rendering-with-router-v4-and-redux/
+app.get('*', (req, res) => {
+  const branch = matchRoutes(routes, req.url);
+  const promises = branch.map(({ route }) => {
+    const fetchData = (route.component as any).fetchData;
+    return fetchData instanceof Function ? fetchData(store) : Promise.resolve(null);
+  });
+  return Promise.all(promises).then(() => {
+    const context = {} as any;
+    const content = renderToString(
+      <Provider store={store}>
+        <StaticRouter location={req.url} context={context}>
+          {renderRoutes(routes)}
+        </StaticRouter>
+      </Provider>
+    );
+    const page = renderHTML(content, store);
+    if (context.status === 404) {
+      res.status(404);
+    }
+    if (context.status === 302) {
+      return res.redirect(302, context.url);
+    }
+    res.status(200).send(page);
+  });
 });
 
-app.listen(appConfig.port, appConfig.host, (err) => {
+app.listen(appConfig.port, appConfig.host, err => {
   if (err) {
     console.error(Chalk.bgRed(err));
   } else {
-    console.info(Chalk.black.bgGreen(
-      `\n\n💂  Listening at http://${appConfig.host}:${appConfig.port}\n`,
-    ));
+    console.info(Chalk.black.bgGreen(`\n\n💂  Listening at http://${appConfig.host}:${appConfig.port}\n`));
   }
 });
 
 function renderHTML(markup: string, store: any) {
-  const html = ReactDOMServer.renderToString(
-    <Html markup={markup} manifest={manifest} store={store} />,
-  );
+  const html = renderToString(<Html markup={markup} manifest={manifest} store={store} />);
 
   return `<!doctype html> ${html}`;
 }

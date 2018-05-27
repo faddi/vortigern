@@ -1,4 +1,4 @@
-import { IStars, IStarsAction } from 'models/stars';
+import { IStars, IStarsAction } from '../../../models/stars';
 
 /** Action Types */
 export const GET_REQUEST: string = 'stars/GET_REQUEST';
@@ -14,22 +14,25 @@ const initialState: IStars = {
 export function starsReducer(state = initialState, action: IStarsAction) {
   switch (action.type) {
     case GET_REQUEST:
-      return Object.assign({}, state, {
+      return {
         isFetching: true,
-      });
+        ...state,
+      };
 
     case GET_SUCCESS:
-      return Object.assign({}, state, {
+      return {
         isFetching: false,
         count: action.payload.count,
-      });
+        ...state,
+      };
 
     case GET_FAILURE:
-      return Object.assign({}, state, {
+      return {
         isFetching: false,
         message: action.payload.message,
         error: true,
-      });
+        ...state,
+      };
 
     default:
       return state;
@@ -38,20 +41,18 @@ export function starsReducer(state = initialState, action: IStarsAction) {
 
 /** Async Action Creator */
 export function getStars() {
-  return (dispatch) => {
+  return dispatch => {
     dispatch(starsRequest());
 
     return fetch('https://api.github.com/repos/barbar/vortigern')
-      .then((res) => {
+      .then(res => {
         if (res.ok) {
-          return res.json()
-            .then((res) => dispatch(starsSuccess(res.stargazers_count)));
+          return res.json().then(res => dispatch(starsSuccess(res.stargazers_count)));
         } else {
-          return res.json()
-            .then((res) => dispatch(starsFailure(res)));
+          return res.json().then(res => dispatch(starsFailure(res)));
         }
       })
-      .catch((err) => dispatch(starsFailure(err)));
+      .catch(err => dispatch(starsFailure(err)));
   };
 }
 
