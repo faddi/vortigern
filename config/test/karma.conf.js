@@ -3,8 +3,9 @@ var webpack = require('webpack');
 var postcssAssets = require('postcss-assets');
 var postcssNext = require('postcss-cssnext');
 var appConfig = require('../main');
+var stylelint = require('stylelint');
 
-module.exports = function (config) {
+module.exports = function(config) {
   const conf = {
     frameworks: ['mocha', 'chai', 'es6-shim'],
 
@@ -15,7 +16,7 @@ module.exports = function (config) {
     preprocessors: {
       '../src/**/*.ts': ['sourcemap'],
       '../src/**/*.tsx': ['sourcemap'],
-      '../webpack/test.js': ['webpack']
+      '../webpack/test.js': ['webpack'],
     },
 
     plugins: ['karma-*'],
@@ -28,11 +29,11 @@ module.exports = function (config) {
       dir: 'coverage',
       'report-config': {
         html: {
-          subdir: 'html'
+          subdir: 'html',
         },
         lcov: {
-          subdir: 'lcov'
-        }
+          subdir: 'lcov',
+        },
       },
     },
 
@@ -51,17 +52,12 @@ module.exports = function (config) {
     concurrency: Infinity,
 
     webpack: {
+      mode: 'development',
       devtool: 'inline-source-map',
 
       resolve: {
-        modules: [
-          path.resolve(__dirname),
-          '../../src',
-          '../../src/app',
-          '../../src/app/redux',
-          'node_modules'
-        ],
-        extensions: ['.json', '.js', '.ts', '.tsx', '.jsx']
+        modules: [path.resolve(__dirname), '../../src', '../../src/app', '../../src/app/redux', 'node_modules'],
+        extensions: ['.json', '.js', '.ts', '.tsx', '.jsx'],
       },
 
       module: {
@@ -69,19 +65,15 @@ module.exports = function (config) {
           {
             enforce: 'pre',
             test: /\.tsx?$/,
-            loader: 'tslint-loader'
+            loader: 'tslint-loader',
           },
           {
             test: /\.tsx?$/,
-            loader: 'awesome-typescript-loader?useCache=false'
+            loader: 'awesome-typescript-loader?useCache=false',
           },
           {
             test: /\.(jpe?g|png|gif)$/i,
-            loader: 'url-loader?limit=1000&name=images/[hash].[ext]'
-          },
-          {
-            test: /\.json$/,
-            loader: 'json-loader'
+            loader: 'url-loader?limit=1000&name=images/[hash].[ext]',
           },
           {
             test: /\.css$/,
@@ -89,47 +81,61 @@ module.exports = function (config) {
             loaders: [
               'style-loader',
               'css-loader?modules&importLoaders=2&localIdentName=[local]___[hash:base64:5]',
-              'postcss-loader'
-            ]
+              {
+                loader: 'postcss-loader',
+                options: {
+                  ident: 'postcss',
+                  plugins: [
+                    stylelint({
+                      files: '../../src/app/*.css',
+                    }),
+                    postcssNext(),
+                    postcssAssets({
+                      relative: true,
+                    }),
+                  ],
+                },
+              },
+            ],
           },
           {
             test: /\.css$/,
             exclude: path.resolve('./src/app'),
-            loader: 'style-loader!css-loader'
+            loader: 'style-loader!css-loader',
           },
           {
             enforce: 'post',
             test: /\.tsx?$/,
             use: {
               loader: 'istanbul-instrumenter-loader',
-              options: {esModules: true},
+              options: { esModules: true },
             },
             include: path.resolve('./src/app'),
             exclude: /node_modules|\.test\.tsx?$/,
-          }
+          },
         ],
       },
 
       externals: {
         'react/lib/ExecutionEnvironment': true,
-        'react/lib/ReactContext': 'window'
+        'react/lib/ReactContext': 'window',
       },
 
       plugins: [
         new webpack.LoaderOptionsPlugin({
           options: {
             tslint: {
-              failOnHint: true
+              failOnHint: true,
             },
-            postcss: function () {
+            postcss: function() {
               return [
                 postcssNext(),
                 postcssAssets({
-                  relative: true
+                  relative: true,
                 }),
               ];
             },
-          }
+          },
         }),
         new webpack.IgnorePlugin(/^fs$/),
         new webpack.IgnorePlugin(/^react\/addons$/),
@@ -137,15 +143,15 @@ module.exports = function (config) {
         new webpack.DefinePlugin({
           'process.env': {
             BROWSER: JSON.stringify(true),
-            NODE_ENV: JSON.stringify('development')
-          }
-        })
-      ]
+            NODE_ENV: JSON.stringify('development'),
+          },
+        }),
+      ],
     },
 
     webpackServer: {
-      noInfo: true
-    }
+      noInfo: true,
+    },
   };
 
   if (process.env.NODE_ENV === 'ci') {

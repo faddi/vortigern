@@ -28,6 +28,7 @@
     ],
     "jsx-alignment": [
       false
-    ]
+    ],
+    "no-implicit-dependencies": [true, "dev"]
   }
 }

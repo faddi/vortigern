@@ -3,6 +3,7 @@ import * as React from 'react';
 import { mount } from 'enzyme';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
+import { MemoryRouter } from 'react-router';
 import rootReducer from '../redux/reducers';
 import configureStore from 'redux-mock-store';
 
@@ -19,7 +20,9 @@ function renderComponent(ComponentClass, state?, props?) {
 
   return mount(
     <Provider store={store}>
-      <ComponentClass {...props} />
+      <MemoryRouter>
+        <ComponentClass {...props} />
+      </MemoryRouter>
     </Provider>
   );
 }
