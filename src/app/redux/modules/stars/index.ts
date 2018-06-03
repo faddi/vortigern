@@ -70,13 +70,12 @@ export function getStars() {
 
     try {
       const response = await fetch('https://api.github.com/repos/barbar/vortigern');
-
       const json = await response.json();
 
       if (response.ok) {
-        return dispatch(starsFailure(json));
-      } else {
         return dispatch(starsSuccess(json.stargazers_count));
+      } else {
+        return dispatch(starsFailure(json.message));
       }
     } catch (e) {
       return dispatch(starsFailure(e));

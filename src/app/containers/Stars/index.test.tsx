@@ -1,19 +1,19 @@
 // tslint:disable: no-unused-expression
 
 import { expect } from 'chai';
-import { renderComponent } from '../../helpers/TestHelper';
+import { renderComponent, createState } from '../../helpers/TestHelper';
 import { Stars } from './index';
 
 /** Mock App. State */
-const state: object = {
+const state = createState({
   stars: {
     count: 61,
     isFetching: false,
   },
-};
+});
 
 describe('<Counter />', () => {
-  const component = renderComponent(Stars, state);
+  const component = renderComponent(Stars, {}, state);
 
   it('Renders with correct style', () => {
     const style = require('./style.css');
