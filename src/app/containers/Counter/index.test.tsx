@@ -1,19 +1,18 @@
 // tslint:disable: no-unused-expression
 
 import { expect } from 'chai';
-import { renderComponent } from '../../helpers/TestHelper';
-import { Counter } from './index';
+import { renderComponent, createState } from '../../helpers/TestHelper';
+import { Counter, IProps } from './index';
+import { ReactWrapper } from 'enzyme';
 
 /** Mock App. State */
-const state: object = {
-  counter: { count: 1 },
-};
+const state = createState();
 
 describe('<Counter />', () => {
-  let component;
+  let component: ReactWrapper;
 
   beforeEach(() => {
-    component = renderComponent(Counter, state);
+    component = renderComponent<IProps>(Counter, {}, state);
   });
 
   it('Renders with correct style', () => {

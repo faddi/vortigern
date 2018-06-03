@@ -17,7 +17,8 @@ const { browserHistory } = require('react-router');
 import { Html } from './app/containers';
 const manifest = require('../build/manifest.json');
 
-const express = require('express');
+import * as express from 'express';
+
 const path = require('path');
 const compression = require('compression');
 const Chalk = require('chalk');
@@ -52,38 +53,9 @@ app.use(favicon(path.join(__dirname, 'public/favicon.ico')));
 
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-/*
-app.get('*', (req, res) => {
-  const location = req.url;
-  const memoryHistory = createMemoryHistory(req.originalUrl);
-  const store = configureStore(memoryHistory);
-  const history = syncHistoryWithStore(memoryHistory, store);
-
-  match({ history, routes, location }, (error, redirectLocation, renderProps) => {
-    if (error) {
-      res.status(500).send(error.message);
-    } else if (redirectLocation) {
-      res.redirect(302, redirectLocation.pathname + redirectLocation.search);
-    } else if (renderProps) {
-      const asyncRenderData = Object.assign({}, renderProps, { store });
-
-      loadOnServer(asyncRenderData).then(() => {
-        const markup = ReactDOMServer.renderToString(
-          <Provider store={store} key="provider">
-            <ReduxAsyncConnect {...renderProps} />
-          </Provider>
-        );
-        res.status(200).send(renderHTML(markup, store));
-      });
-    } else {
-      res.status(404).send('Not Found?');
-    }
-  });
-});
-*/
-
 const store = configureStore(browserHistory);
 
+// TODO: stolen from check if the fetchData approach is ok
 // https://crypt.codemancers.com/posts/2017-06-03-reactjs-server-side-rendering-with-router-v4-and-redux/
 app.get('*', (req, res) => {
   const branch = matchRoutes(routes, req.url);
@@ -111,7 +83,7 @@ app.get('*', (req, res) => {
   });
 });
 
-app.listen(appConfig.port, appConfig.host, err => {
+app.listen(appConfig.port, appConfig.host, (err: Error) => {
   if (err) {
     console.error(Chalk.bgRed(err));
   } else {

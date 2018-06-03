@@ -6,12 +6,12 @@ import { Store } from 'redux';
 
 interface IHtmlProps {
   manifest?: any;
-  markup?: string;
-  store?: Store<IStore>;
+  markup: string;
+  store: Store<IStore>;
 }
 
-class Html extends React.Component<IHtmlProps, {}> {
-  private resolve(files) {
+class Html extends React.Component<IHtmlProps> {
+  private resolve(files: string[]) {
     return files
       .map(src => {
         if (!this.props.manifest[src]) {

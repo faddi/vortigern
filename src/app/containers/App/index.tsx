@@ -8,7 +8,7 @@ import { routes } from '../../routes';
 
 const style = require('./style.css');
 
-class App extends React.Component<any, any> {
+class App extends React.Component {
   public render() {
     return (
       <section className={style.AppContainer}>

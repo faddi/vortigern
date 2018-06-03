@@ -5,7 +5,7 @@ import { starsReducer } from './modules/stars';
 import { IStore } from './IStore';
 
 const rootReducer: Reducer<IStore> = combineReducers<IStore>({
-  routing: routerReducer,
+  router: routerReducer,
   counter: counterReducer,
   stars: starsReducer,
 });

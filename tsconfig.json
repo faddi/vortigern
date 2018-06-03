@@ -11,7 +11,8 @@
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "jsx": "react",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "strict": true
   },
   "exclude": [
     "node_modules",

@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import { fetchMock, mockStore } from '../../../helpers/TestHelper';
-import * as stars from './';
-import { IStarsAction } from '../../../models/stars';
+import { IStarsAction, GET_REQUEST, GET_SUCCESS, GET_FAILURE, getStars } from './';
 
 /** Mock Data */
 const githubResponse = {
@@ -29,14 +28,13 @@ describe('Stars Module', () => {
         });
 
         const expectedActions: IStarsAction[] = [
-          { type: stars.GET_REQUEST },
-          { type: stars.GET_SUCCESS, payload: { count: githubResponse.stargazers_count } },
+          { type: GET_REQUEST },
+          { type: GET_SUCCESS, count: githubResponse.stargazers_count },
         ];
 
         const store = mockStore({});
 
-        stars
-          .getStars()(store.dispatch)
+        getStars()(store.dispatch)
           .then(() => expect(store.getActions()).to.eql(expectedActions))
           .then(() => done())
           .catch(err => done(err));
@@ -50,14 +48,13 @@ describe('Stars Module', () => {
         });
 
         const expectedActions: IStarsAction[] = [
-          { type: stars.GET_REQUEST },
-          { type: stars.GET_FAILURE, payload: { message: errResponse } },
+          { type: GET_REQUEST },
+          { type: GET_FAILURE, message: errResponse.message },
         ];
 
         const store = mockStore({});
 
-        stars
-          .getStars()(store.dispatch)
+        getStars()(store.dispatch)
           .then(() => expect(store.getActions()).to.eql(expectedActions))
           .then(() => done())
           .catch(err => done(err));

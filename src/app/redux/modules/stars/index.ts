@@ -1,9 +1,33 @@
-import { IStars, IStarsAction } from '../../../models/stars';
+import { Dispatch } from 'redux';
+
+export interface IStars {
+  isFetching?: boolean;
+  count?: number;
+  error?: boolean;
+  message?: any;
+}
 
 /** Action Types */
-export const GET_REQUEST: string = 'stars/GET_REQUEST';
-export const GET_SUCCESS: string = 'stars/GET_SUCCESS';
-export const GET_FAILURE: string = 'stars/GET_FAILURE';
+
+export const GET_REQUEST = 'stars/GET_REQUEST';
+export const GET_SUCCESS = 'stars/GET_SUCCESS';
+export const GET_FAILURE = 'stars/GET_FAILURE';
+
+export interface IActionGetRequest {
+  type: typeof GET_REQUEST;
+}
+
+export interface IActionGetSuccess {
+  type: typeof GET_SUCCESS;
+  count: number;
+}
+
+export interface IActionGetFailure {
+  type: typeof GET_FAILURE;
+  message: string;
+}
+
+export type IStarsAction = IActionGetRequest | IActionGetSuccess | IActionGetFailure;
 
 /** Initial State */
 const initialState: IStars = {
@@ -22,14 +46,14 @@ export function starsReducer(state = initialState, action: IStarsAction) {
     case GET_SUCCESS:
       return {
         isFetching: false,
-        count: action.payload.count,
+        count: action.count,
         ...state,
       };
 
     case GET_FAILURE:
       return {
         isFetching: false,
-        message: action.payload.message,
+        message: action.message,
         error: true,
         ...state,
       };
@@ -41,44 +65,44 @@ export function starsReducer(state = initialState, action: IStarsAction) {
 
 /** Async Action Creator */
 export function getStars() {
-  return dispatch => {
+  return async (dispatch: Dispatch<IStarsAction>) => {
     dispatch(starsRequest());
 
-    return fetch('https://api.github.com/repos/barbar/vortigern')
-      .then(res => {
-        if (res.ok) {
-          return res.json().then(res => dispatch(starsSuccess(res.stargazers_count)));
-        } else {
-          return res.json().then(res => dispatch(starsFailure(res)));
-        }
-      })
-      .catch(err => dispatch(starsFailure(err)));
+    try {
+      const response = await fetch('https://api.github.com/repos/barbar/vortigern');
+
+      const json = await response.json();
+
+      if (response.ok) {
+        return dispatch(starsFailure(json));
+      } else {
+        return dispatch(starsSuccess(json.stargazers_count));
+      }
+    } catch (e) {
+      return dispatch(starsFailure(e));
+    }
   };
 }
 
 /** Action Creator */
-export function starsRequest(): IStarsAction {
+export function starsRequest(): IActionGetRequest {
   return {
     type: GET_REQUEST,
   };
 }
 
 /** Action Creator */
-export function starsSuccess(count: number): IStarsAction {
+export function starsSuccess(count: number): IActionGetSuccess {
   return {
     type: GET_SUCCESS,
-    payload: {
-      count,
-    },
+    count,
   };
 }
 
 /** Action Creator */
-export function starsFailure(message: any): IStarsAction {
+export function starsFailure(message: string): IActionGetFailure {
   return {
     type: GET_FAILURE,
-    payload: {
-      message,
-    },
+    message,
   };
 }

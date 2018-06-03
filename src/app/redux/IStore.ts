@@ -1,9 +1,9 @@
-import { ICounter } from '../models/counter';
-import { IStars } from '../models/stars';
+import { ICounter } from '../redux/modules/counter';
+import { IStars } from '../redux/modules/stars';
 import { RouterState } from 'react-router-redux';
 
 export interface IStore {
-  routing: RouterState;
+  router: RouterState;
   counter: ICounter;
   stars: IStars;
 }

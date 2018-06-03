@@ -1,10 +1,8 @@
 import * as React from 'react';
-// import { getStars } from '../../redux/modules/stars';
-import { IStars, IStarsAction } from '../../models/stars';
 const { connect } = require('react-redux');
-// const { asyncConnect } = require('redux-connect');
 import { ActionCreator, Dispatch } from 'redux';
-import { getStars } from '../../redux/modules/stars';
+import { getStars, IStarsAction, IStars } from '../../redux/modules/stars';
+import { IStore } from '../../redux/IStore';
 const style = require('./style.css');
 
 interface IProps {
@@ -13,21 +11,13 @@ interface IProps {
   dispatch: Dispatch;
 }
 
-// @asyncConnect([
-//   {
-//     promise: ({ store: { dispatch } }) => {
-//       return dispatch(getStars());
-//     },
-//   },
-// ])
-
 @connect(
-  state => {
+  (state: IStore) => {
     return { stars: state.stars };
   },
-  (d: Dispatch) => ({ dispatch: d })
+  (d: Dispatch<IStarsAction>) => ({ dispatch: d })
 )
-class Stars extends React.Component<IProps, {}> {
+class Stars extends React.Component<IProps> {
   public componentDidMount() {
     console.log('mount');
     getStars()(this.props.dispatch);

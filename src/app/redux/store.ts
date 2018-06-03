@@ -4,8 +4,9 @@ import { routerMiddleware } from 'react-router-redux';
 import rootReducer from './reducers';
 import { IStore } from './IStore';
 import { createLogger } from 'redux-logger';
+import { History } from 'history';
 
-export function configureStore(history, initialState?: IStore): Store<IStore> {
+export function configureStore(history: History, initialState?: IStore): Store<IStore> {
   const middlewares: Middleware[] = [routerMiddleware(history)];
 
   /** Add Only Dev. Middlewares */
@@ -20,7 +21,7 @@ export function configureStore(history, initialState?: IStore): Store<IStore> {
 
   const store: Store<IStore> = createStore<IStore, Action<any>, {}, {}>(
     rootReducer,
-    initialState,
+    initialState ? initialState : {},
     composeEnhancers(applyMiddleware(...middlewares))
   );
 
