@@ -9,10 +9,14 @@
     "inlineSources": false,
     "experimentalDecorators": true,
     "noUnusedParameters": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowJs": true,
     "noUnusedLocals": true,
     "jsx": "react",
     "moduleResolution": "node",
-    "strict": true
+    "strict": true,
+    "checkJs": false
   },
   "exclude": [
     "node_modules",

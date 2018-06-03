@@ -1,24 +1,17 @@
 import * as React from 'react';
-import { increment, decrement, ICounter, ICounterAction } from '../../redux/modules/counter/';
-import { ActionCreator, Dispatch } from 'redux';
+import { increment, decrement, ICounter, IDecrementAction, IIncrementAction } from '../../redux/modules/counter/';
+import { Dispatch, bindActionCreators } from 'redux';
 import { IStore } from '../../redux/IStore';
-const { connect } = require('react-redux');
+import { connect } from 'react-redux';
 const style = require('./style.css');
 
 export interface IProps {
   counter: ICounter;
-  increment: ActionCreator<ICounterAction>;
-  decrement: ActionCreator<ICounterAction>;
+  increment: () => IIncrementAction;
+  decrement: () => IDecrementAction;
 }
 
-@connect(
-  (state: IStore) => ({ counter: state.counter }),
-  (dispatch: Dispatch) => ({
-    decrement: () => dispatch(decrement()),
-    increment: () => dispatch(increment()),
-  })
-)
-class Counter extends React.Component<IProps> {
+class CounterC extends React.Component<IProps> {
   public render() {
     const { increment, decrement, counter } = this.props;
 
@@ -37,4 +30,10 @@ class Counter extends React.Component<IProps> {
   }
 }
 
-export { Counter };
+export const Counter = connect(
+  (state: IStore) => ({ counter: state.counter }),
+  (dispatch: Dispatch) => ({
+    decrement: bindActionCreators(decrement, dispatch),
+    increment: bindActionCreators(increment, dispatch),
+  })
+)(CounterC);

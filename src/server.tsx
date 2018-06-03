@@ -1,8 +1,6 @@
-const appConfig = require('../config/main');
+import 'babel-polyfill';
 
-import * as e6p from 'es6-promise';
-(e6p as any).polyfill();
-import 'isomorphic-fetch';
+import appConfig from '../config/main';
 
 import * as React from 'react';
 import { renderToString } from 'react-dom/server';
@@ -12,17 +10,15 @@ import { StaticRouter } from 'react-router';
 import { matchRoutes, renderRoutes } from 'react-router-config';
 import { configureStore } from './app/redux/store';
 import { routes } from './app/routes';
-const { browserHistory } = require('react-router');
+import { createMemoryHistory } from 'history';
 
 import { Html } from './app/containers';
 const manifest = require('../build/manifest.json');
-
-import * as express from 'express';
-
-const path = require('path');
-const compression = require('compression');
-const Chalk = require('chalk');
-const favicon = require('serve-favicon');
+import express from 'express';
+import path from 'path';
+import compression from 'compression';
+import Chalk from 'chalk';
+import favicon from 'serve-favicon';
 
 const app = express();
 
@@ -53,7 +49,7 @@ app.use(favicon(path.join(__dirname, 'public/favicon.ico')));
 
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-const store = configureStore(browserHistory);
+const store = configureStore(createMemoryHistory());
 
 // TODO: stolen from check if the fetchData approach is ok
 // https://crypt.codemancers.com/posts/2017-06-03-reactjs-server-side-rendering-with-router-v4-and-redux/
@@ -85,7 +81,7 @@ app.get('*', (req, res) => {
 
 app.listen(appConfig.port, appConfig.host, (err: Error) => {
   if (err) {
-    console.error(Chalk.bgRed(err));
+    console.error(Chalk.bgRed(String(err)));
   } else {
     console.info(Chalk.black.bgGreen(`\n\n💂  Listening at http://${appConfig.host}:${appConfig.port}\n`));
   }

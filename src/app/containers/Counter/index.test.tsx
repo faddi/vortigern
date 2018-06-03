@@ -12,7 +12,7 @@ describe('<Counter />', () => {
   let component: ReactWrapper;
 
   beforeEach(() => {
-    component = renderComponent<IProps>(Counter, {}, state);
+    component = renderComponent<Partial<IProps>>(Counter, {}, state);
   });
 
   it('Renders with correct style', () => {
