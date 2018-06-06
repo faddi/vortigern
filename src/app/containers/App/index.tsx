@@ -5,20 +5,20 @@ import { Helmet } from 'react-helmet';
 import { Header } from '../../components';
 import { renderRoutes } from 'react-router-config';
 import { routes } from '../../routes';
+import { hot } from 'react-hot-loader';
 
 const style = require('./style.css');
 
-class App extends React.Component {
+class AppC extends React.Component {
   public render() {
     return (
       <section className={style.AppContainer}>
         <Helmet {...appConfig.app} {...appConfig.app.head} />
         <Header />
-        {this.props.children}
         {renderRoutes(routes[0].routes)}
       </section>
     );
   }
 }
 
-export { App };
+export const App = hot(module)(AppC);

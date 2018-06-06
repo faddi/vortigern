@@ -21,13 +21,24 @@ const entry = (
   </Provider>
 );
 
-if (process.env.NODE_ENV === 'production') {
-  ReactDOM.hydrate(entry, document.getElementById('app'));
-} else {
-  // Gives expected behavior when developing
-  // Example: updated className does not change as expected with hydrate.
-  // WARNING: This could mask logic for true intended differences between client and server.
-  // https://github.com/facebook/react/issues/10591
-  // https://github.com/necolas/react-native-web/issues/918
-  ReactDOM.render(entry, document.getElementById('app'));
+const entryNode = document.getElementById('app');
+
+if (!entryNode) {
+  throw Error('Could not find entry dom node: ' + entryNode);
+}
+
+ReactDOM.hydrate(entry, entryNode);
+
+if ((module as any).hot) {
+  (module as any).hot.accept();
+
+  (module as any).hot.accept('./app/routes', () => {
+    ReactDOM.unmountComponentAtNode(entryNode);
+    ReactDOM.render(
+      <Provider store={store}>
+        <ConnectedRouter history={history}>{renderRoutes(routes)}</ConnectedRouter>
+      </Provider>,
+      entryNode
+    );
+  });
 }
